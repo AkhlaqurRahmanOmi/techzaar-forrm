@@ -31,14 +31,33 @@ export class AppService {
     const template = Handlebars.compile(templateSource);
     const htmlContent = template(contactData);
 
-    const mailOptions = {
+    const adminMailOptions = {
       from: this.configService.get<string>('SENDER_EMAIL'),
       to: this.configService.get<string>('RECIVER_EMAIL'),
       subject: `New Contact Form Submission from ${contactData.name}`,
       html: htmlContent,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    const replyTemplatePath = path.join(
+      process.cwd(),
+      'templates',
+      'reply-email.hbs',
+    );
+    const replyTemplateSource = fs.readFileSync(replyTemplatePath, 'utf-8');
+    const replyTemplate = Handlebars.compile(replyTemplateSource);
+    const replyHtmlContent = replyTemplate(contactData);
+
+    const replyMailOptions = {
+      from: this.configService.get<string>('SENDER_EMAIL'),
+      to: contactData.email,
+      subject: 'Thanks for contacting Techzaar Innovation',
+      html: replyHtmlContent,
+    };
+
+    await Promise.all([
+      this.transporter.sendMail(adminMailOptions),
+      this.transporter.sendMail(replyMailOptions),
+    ]);
   }
 
   async sendProjectEmail(projectData: ProjectDto): Promise<void> {
