@@ -47,7 +47,7 @@ export class AppService {
     const replyTemplate = Handlebars.compile(replyTemplateSource);
     const replyHtmlContent = replyTemplate({
       ...contactData,
-      logoCid: 'cid:logo-black',
+      logoCid: 'cid:logo',
       emailBgCid: 'cid:email-bg',
       faviconCid: 'cid:favicon',
     });
@@ -59,9 +59,9 @@ export class AppService {
       html: replyHtmlContent,
       attachments: [
         {
-          filename: 'black.png',
-          path: path.join(process.cwd(), 'public', 'images', 'black.png'),
-          cid: 'logo-black',
+          filename: 'logo.jpeg',
+          path: path.join(process.cwd(), 'public', 'images', 'logo.jpeg'),
+          cid: 'logo',
         },
         {
           filename: 'email-bg.jpg',
