@@ -45,13 +45,35 @@ export class AppService {
     );
     const replyTemplateSource = fs.readFileSync(replyTemplatePath, 'utf-8');
     const replyTemplate = Handlebars.compile(replyTemplateSource);
-    const replyHtmlContent = replyTemplate(contactData);
+    const replyHtmlContent = replyTemplate({
+      ...contactData,
+      logoCid: 'cid:logo-black',
+      emailBgCid: 'cid:email-bg',
+      faviconCid: 'cid:favicon',
+    });
 
     const replyMailOptions = {
       from: this.configService.get<string>('SENDER_EMAIL'),
       to: contactData.email,
       subject: 'Thanks for contacting Techzaar Innovation',
       html: replyHtmlContent,
+      attachments: [
+        {
+          filename: 'black.png',
+          path: path.join(process.cwd(), 'public', 'images', 'black.png'),
+          cid: 'logo-black',
+        },
+        {
+          filename: 'email-bg.jpg',
+          path: path.join(process.cwd(), 'public', 'images', 'email-bg.jpg'),
+          cid: 'email-bg',
+        },
+        {
+          filename: 'favicon.svg',
+          path: path.join(process.cwd(), 'public', 'images', 'favicon.svg'),
+          cid: 'favicon',
+        },
+      ],
     };
 
     await Promise.all([
