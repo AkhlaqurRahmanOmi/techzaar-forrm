@@ -68,13 +68,30 @@ export class AppService {
     const template = Handlebars.compile(templateSource);
     const htmlContent = template(projectData);
 
-    const mailOptions = {
+    const adminMailOptions = {
       from: this.configService.get<string>('SENDER_EMAIL'),
       to: this.configService.get<string>('RECIVER_EMAIL'),
       subject: `New Project Inquiry from ${projectData.name}`,
       html: htmlContent,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    const replyTemplatePath = path.join(
+      process.cwd(),
+      'templates',
+      'reply-email.html',
+    );
+    const replyHtmlContent = fs.readFileSync(replyTemplatePath, 'utf-8');
+
+    const replyMailOptions = {
+      from: this.configService.get<string>('SENDER_EMAIL'),
+      to: projectData.email,
+      subject: 'Thanks for contacting Techzaar Innovation',
+      html: replyHtmlContent,
+    };
+
+    await Promise.all([
+      this.transporter.sendMail(adminMailOptions),
+      this.transporter.sendMail(replyMailOptions),
+    ]);
   }
 }
